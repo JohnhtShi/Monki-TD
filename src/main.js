@@ -1241,22 +1241,54 @@ function drawGrid() {
 }
 
 function drawPath() {
+  const isNebula = state.theme === "nebula";
+
+  const pathColors = isNebula
+    ? {
+        base:   "rgba(14, 6, 28, 0.88)",
+        glow:   "rgba(90, 30, 160, 0.50)",
+        edge:   "rgba(55, 180, 210, 0.30)",
+        center: "rgba(90, 230, 200, 0.28)",
+      }
+    : {
+        base:   "rgba(8, 18, 28, 0.82)",
+        glow:   "rgba(90, 230, 200, 0.20)",
+        edge:   "rgba(90, 230, 200, 0.18)",
+        center: "rgba(248, 198, 109, 0.30)",
+      };
+
   ctx.save();
   ctx.lineJoin = "round";
   ctx.lineCap = "round";
+
+  // build the path once, reuse for all strokes
   ctx.beginPath();
   PATH_POINTS.forEach((point, index) => {
     const screen = worldToScreen(point);
     if (index === 0) ctx.moveTo(screen.x, screen.y);
     else ctx.lineTo(screen.x, screen.y);
   });
-  ctx.strokeStyle = "rgba(90, 230, 200, 0.2)";
+
+  // wide dark base
+  ctx.strokeStyle = pathColors.base;
   ctx.lineWidth = PATH_WIDTH * state.camera.zoom;
   ctx.stroke();
 
-  ctx.strokeStyle = "rgba(248, 198, 109, 0.3)";
-  ctx.lineWidth = (PATH_WIDTH * 0.4) * state.camera.zoom;
+  // outer colour glow
+  ctx.strokeStyle = pathColors.glow;
+  ctx.lineWidth = PATH_WIDTH * state.camera.zoom;
   ctx.stroke();
+
+  // mid edge tint
+  ctx.strokeStyle = pathColors.edge;
+  ctx.lineWidth = PATH_WIDTH * 0.65 * state.camera.zoom;
+  ctx.stroke();
+
+  // bright center stripe
+  ctx.strokeStyle = pathColors.center;
+  ctx.lineWidth = PATH_WIDTH * 0.22 * state.camera.zoom;
+  ctx.stroke();
+
   ctx.restore();
 }
 
