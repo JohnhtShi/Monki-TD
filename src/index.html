@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rift TD</title>
+    <meta
+      name="description"
+      content="Rift TD — a full-screen tower defense game with pan and zoom, automatic waves, and precision hitboxes."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Teko:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="game">
+      <canvas id="shader-bg" class="shader-canvas" aria-hidden="true"></canvas>
+      <canvas id="map2d" class="map-canvas" aria-label="Map"></canvas>
+
+      <div class="hud">
+        <div class="hud-top">
+          <div class="hud-strip panel">
+            <div class="hud-strip-brand">
+              <div class="logo-mark">RT</div>
+              <div class="logo-text">
+                <span>Rift TD</span>
+                <strong>Tower Defense</strong>
+              </div>
+            </div>
+            <div class="stat-grid stat-grid--dashboard">
+              <div class="stat">
+                <span>Wave</span>
+                <strong id="stat-wave">01</strong>
+              </div>
+              <div class="stat">
+                <span>Money</span>
+                <strong id="stat-gold">$750</strong>
+              </div>
+              <div class="stat">
+                <span>Enemies</span>
+                <strong id="stat-enemies">0</strong>
+              </div>
+              <div class="stat">
+                <span>Lives</span>
+                <strong id="stat-lives">20</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hud-left-stack">
+          <div class="build-panel panel" data-panel="build">
+            <div class="panel-top">
+              <div class="panel-title">
+                <h2>Build Towers</h2>
+                <p>Click a tower, then click the map to place.</p>
+              </div>
+              <button
+                class="panel-toggle"
+                type="button"
+                aria-expanded="true"
+                aria-controls="build-body"
+              >
+                Minimize
+              </button>
+            </div>
+            <div class="panel-body" id="build-body">
+              <div class="tower-grid">
+                <button class="tower-button" type="button" data-build="blood">
+                  <img
+                    src="../assets/towers/blood-moon.png"
+                    alt="Blood Moon Tower"
+                  />
+                  <div>
+                    <span>Blood Moon</span>
+                    <strong>$140</strong>
+                  </div>
+                </button>
+                <button class="tower-button" type="button" data-build="obelisk">
+                  <img src="../assets/towers/obelisk.png" alt="Obelisk Tower" />
+                  <div>
+                    <span>Obelisk</span>
+                    <strong>$180</strong>
+                  </div>
+                </button>
+                <button class="tower-button" type="button" data-build="bank">
+                  <img
+                    src="../assets/towers/monki-bank.png"
+                    alt="Monki Bank Tower"
+                  />
+                  <div>
+                    <span>Monki Bank</span>
+                    <strong>$90</strong>
+                  </div>
+                </button>
+                <button class="tower-button" type="button" data-build="barn">
+                  <img
+                    src="../assets/towers/monki-barn.png"
+                    alt="Monki Barn Tower"
+                  />
+                  <div>
+                    <span>Monki Barn</span>
+                    <strong>$120</strong>
+                  </div>
+                </button>
+                <button class="tower-button" type="button" data-build="stall">
+                  <img
+                    src="../assets/towers/monki-stall.png"
+                    alt="Monki Stall Tower"
+                  />
+                  <div>
+                    <span>Monki Stall</span>
+                    <strong>$110</strong>
+                  </div>
+                </button>
+                <button class="tower-button" type="button" data-build="jail">
+                  <img
+                    src="../assets/towers/monki-jail.png"
+                    alt="Monki Jail Tower"
+                  />
+                  <div>
+                    <span>Monki Jail</span>
+                    <strong>$200</strong>
+                  </div>
+                </button>
+                <button class="tower-button" type="button" data-build="atm">
+                  <img
+                    src="../assets/towers/monki-atm.png"
+                    alt="ATM Relay Tower"
+                  />
+                  <div>
+                    <span>ATM Relay</span>
+                    <strong>$130</strong>
+                  </div>
+                </button>
+                <button class="tower-button" type="button" data-build="banana">
+                  <img
+                    src="../assets/towers/monki-banana-tree.png"
+                    alt="Banana Grove Tower"
+                  />
+                  <div>
+                    <span>Banana Grove</span>
+                    <strong>$160</strong>
+                  </div>
+                </button>
+                <button class="tower-button" type="button" data-build="relic">
+                  <img
+                    src="../assets/towers/obelisk-effects.png"
+                    alt="Obelisk Relic Tower"
+                  />
+                  <div>
+                    <span>Obelisk Relic</span>
+                    <strong>$240</strong>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hud-right-stack">
+
+          <div class="selection panel" id="selection-panel" data-panel="selection">
+            <div class="panel-top">
+              <div class="panel-title">
+                <h2>Selected Tower</h2>
+                <p id="selection-name">No tower selected</p>
+              </div>
+              <button
+                class="panel-toggle"
+                type="button"
+                aria-expanded="true"
+                aria-controls="selection-body"
+              >
+                Minimize
+              </button>
+            </div>
+            <div class="panel-body selection-body" id="selection-body">
+              <p class="selection-empty">
+                Select a tower to see upgrades and range details.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bottom-bar">
+          <div class="toggle-group">
+            <button class="toggle" id="toggle-hitboxes" type="button">
+              Hitboxes: Off
+            </button>
+            <button class="toggle" id="toggle-pause" type="button">
+              Pause: Off
+            </button>
+            <button class="toggle" id="toggle-theme" type="button">
+              Theme: Nebula
+            </button>
+          </div>
+          <div class="hint">
+            <span>Hotkeys</span>
+            <strong>1-9</strong> Build towers
+            <strong>H</strong> Hitboxes
+            <strong>T</strong> Theme
+            <strong>Drag</strong> Pan map
+            <strong>Scroll</strong> Zoom map
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="main.js"></script>
+  </body>
+</html>
