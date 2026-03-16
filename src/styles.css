@@ -141,14 +141,24 @@ select {
   top: 112px;
   left: 22px;
   width: min(360px, 90vw);
-  height: 50vh; /* half screen */
+  height: calc(50vh - 132px);
+  min-height: 500px;
   display: flex;
   flex-direction: column;
   pointer-events: auto;
 }
 
+.hud-left-stack > .panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
 .hud-left-stack .panel-body {
-  flex: 1;
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
 }
 
@@ -316,7 +326,6 @@ select {
   display: grid;
   gap: 12px;
   padding-right: 4px;
-  overflow-y: auto;
 }
 
 .tower-button {
