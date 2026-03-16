@@ -1492,10 +1492,38 @@ function selectTowerAt(position) {
   state.selectedTower = clicked || null;
 }
 
+function renderBuildPreview(typeId) {
+  const template = TOWER_TYPES[typeId];
+  if (!template) return;
+  ui.selectionName.textContent = template.name;
+  ui.selectionBody.innerHTML = `
+    <div class="selection-info">
+      <div class="selection-stat"><span>Cost</span><strong>$${template.cost}</strong></div>
+      <div class="selection-stat"><span>Range</span><strong>${template.range}</strong></div>
+      <div class="selection-stat"><span>Damage</span><strong>${template.damage}</strong></div>
+      <div class="selection-stat"><span>Fire Rate</span><strong>${template.fireRate.toFixed(2)}</strong></div>
+      ${[
+        { label: "Role", text: template.role },
+        { label: "Attack", text: template.attack },
+        { label: "Special", text: template.special },
+      ].filter(d => d.text).map(d => `
+        <div class="selection-detail">
+          <span>${d.label}</span>
+          <p>${d.text}</p>
+        </div>
+      `).join("")}
+    </div>
+  `;
+}
+
 function updateSelectionPanel() {
   const tower = state.selectedTower;
   if (!tower) {
-    if (uiCache.selectedId !== null) {
+    if (state.buildSelection && uiCache.selectedId !== state.buildSelection) {
+      renderBuildPreview(state.buildSelection);
+      uiCache.selectedId = state.buildSelection;
+      uiCache.towerKey = "";
+    } else if (!state.buildSelection && uiCache.selectedId !== null) {
       ui.selectionName.textContent = "No tower selected";
       ui.selectionBody.innerHTML = `<p class=\"selection-empty\">Select a tower to see upgrades and range details.</p>`;
       uiCache.selectedId = null;
@@ -1868,6 +1896,8 @@ function handleWheel(event) {
 
 function handleBuildSelection(typeId) {
   state.buildSelection = typeId;
+  state.selectedTower = null;
+  uiCache.selectedId = null;
   ui.buildButtons.forEach((button) => {
     button.classList.toggle("is-active", button.dataset.build === typeId);
   });
