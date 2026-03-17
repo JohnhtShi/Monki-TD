@@ -14,6 +14,11 @@ const ui = {
   togglePause: document.getElementById("toggle-pause"),
   toggleTheme: document.getElementById("toggle-theme"),
   buildButtons: Array.from(document.querySelectorAll(".tower-button")),
+  endscreen: document.getElementById("endscreen"),
+  endscreenWave: document.getElementById("endscreen-wave"),
+  endscreenGold: document.getElementById("endscreen-gold"),
+  endscreenEnemies: document.getElementById("endscreen-enemies"),
+  endscreenRestart: document.getElementById("endscreen-restart"),
 };
 
 const WORLD = { width: 4800, height: 3200 };
@@ -533,6 +538,8 @@ const state = {
   paused: false,
   showHitboxes: false,
   theme: getInitialTheme(),
+  gameOver: false,
+  enemiesKilled: 0,
   camera: {
     x: PATH_POINTS[0].x,
     y: PATH_POINTS[0].y,
@@ -900,6 +907,7 @@ function getEnemyReward(enemy) {
 function killEnemy(enemy) {
   state.gold += getEnemyReward(enemy);
   state.enemies = state.enemies.filter((item) => item.id !== enemy.id);
+  state.enemiesKilled += 1;
 }
 
 function isElite(enemy) {
@@ -1197,6 +1205,10 @@ function update(dt) {
   updateTowers(dt);
   updateProjectiles(dt);
   updateUI();
+  
+  if (state.lives <= 0 && !state.gameOver) {
+    showEndscreen();
+  }
 }
 
 function updateUI() {
@@ -1205,6 +1217,54 @@ function updateUI() {
   ui.gold.textContent = `$${Math.floor(state.gold)}`;
   ui.enemies.textContent = String(state.enemies.length + state.spawnRemaining + state.bossRemaining);
   updateSelectionPanel();
+}
+
+function showEndscreen() {
+  if (state.gameOver) return;
+  state.gameOver = true;
+  state.paused = true;
+  
+  // Update endscreen stats
+  ui.endscreenWave.textContent = String(state.wave).padStart(2, "0");
+  ui.endscreenGold.textContent = `$${Math.floor(state.gold)}`;
+  ui.endscreenEnemies.textContent = String(state.enemiesKilled);
+  
+  // Show endscreen
+  ui.endscreen.classList.add("is-visible");
+}
+
+function resetGame() {
+  // Reset state
+  state.time = 0;
+  state.gold = 750;
+  state.lives = 20;
+  state.wave = 1;
+  state.enemies = [];
+  state.towers = [];
+  state.projectiles = [];
+  state.spawnTimer = 0;
+  state.spawnRemaining = 0;
+  state.bossRemaining = 0;
+  state.waveCooldown = 2.2;
+  state.selectedTower = null;
+  state.buildSelection = null;
+  state.paused = false;
+  state.gameOver = false;
+  state.enemiesKilled = 0;
+  
+  // Reset camera
+  state.camera.x = WORLD.width / 2;
+  state.camera.y = WORLD.height / 2;
+  state.camera.zoom = 0.35;
+  
+  // Hide endscreen
+  ui.endscreen.classList.remove("is-visible");
+  
+  // Reset UI
+  updateUI();
+  
+  // Start new game
+  spawnWave();
 }
 
 function drawGrid() {
@@ -1473,7 +1533,7 @@ function isValidPlacement(position, size) {
 
 function placeTower(position) {
   const typeId = state.buildSelection;
-  if (!typeId) return;
+  if (!typeId || state.gameOver) return;
   const template = TOWER_TYPES[typeId];
   if (!isValidPlacement(position, template.size)) return;
   if (!canAfford(template.cost)) return;
@@ -1911,6 +1971,7 @@ function handleToggles() {
   });
 
   ui.togglePause.addEventListener("click", () => {
+    if (state.gameOver) return;
     state.paused = !state.paused;
     ui.togglePause.classList.toggle("is-active", state.paused);
     ui.togglePause.textContent = `Pause: ${state.paused ? "On" : "Off"}`;
@@ -1989,6 +2050,8 @@ function bindEvents() {
 
   handleToggles();
   bindPanelToggles();
+
+  ui.endscreenRestart.addEventListener("click", resetGame);
 
   window.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
