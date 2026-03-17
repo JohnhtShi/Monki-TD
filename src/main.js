@@ -1141,8 +1141,7 @@ function updateProjectiles(dt) {
     if (hit) {
       hit.hp -= projectile.damage;
       if (hit.hp <= 0) {
-        state.gold += hit.reward;
-        state.enemies = state.enemies.filter((item) => item.id !== hit.id);
+        killEnemy(hit);
       }
       state.projectiles.splice(i, 1);
       continue;
@@ -1251,6 +1250,14 @@ function resetGame() {
   state.paused = false;
   state.gameOver = false;
   state.enemiesKilled = 0;
+  
+  // Reset UI cache
+  uiCache.selectedId = null;
+  ui.buildButtons.forEach((btn) => btn.classList.remove("is-active"));
+  
+  // Reset input state
+  dragging = false;
+  activePointerId = null;
   
   // Reset camera
   state.camera.x = WORLD.width / 2;
