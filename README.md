@@ -1,6 +1,7 @@
 # Monki TD
 
 A web based baed2D tower defense game built with vanilla JavaScript and WebGL shader backgrounds. 
+<img width="1490" height="937" alt="image" src="https://github.com/user-attachments/assets/58f73c0a-67b2-496d-973f-a3311c2aa149" />
 
 ## Credits
 
